@@ -82,4 +82,48 @@ const deleteTodo = asyncHandler(async (req, res) => {
     )
 })
 
-export { addTodo, updateTodo, deleteTodo, myTodo }
+
+
+const updateTodoContent = asyncHandler(async (req, res) => {
+    const { id } = req.params
+    const { newTitle, newContent } = req.body
+    const existingTodo = await Todo.findById(id);
+
+    if (!existingTodo) {
+        throw new ApiError(404, "Todo not found");
+    }
+
+
+    existingTodo.title = newTitle;
+    existingTodo.content = newContent;
+    existingTodo.isEditing = false;
+    const updatedTodo = await existingTodo.save();
+
+    if (!updatedTodo) {
+        throw new ApiError(500, "Something went wrong")
+    }
+
+    res.status(201).json(
+        new ApiResponse(201, updatedTodo, "Update Successfully")
+    )
+})
+const editTodo = asyncHandler(async (req, res) => {
+    const { id } = req.params
+    const existingTodo = await Todo.findById(id);
+    if (!existingTodo) {
+        throw new ApiError(404, "Todo not found");
+    }
+    existingTodo.isEditing = !existingTodo.isEditing;
+
+    const updatedTodo = await existingTodo.save();
+
+    if (!updatedTodo) {
+        throw new ApiError(500, "Something went wrong")
+    }
+
+    res.status(201).json(
+        new ApiResponse(201, updatedTodo, "Update Successfully")
+    )
+})
+
+export { addTodo, updateTodo, deleteTodo, myTodo, updateTodoContent, editTodo }

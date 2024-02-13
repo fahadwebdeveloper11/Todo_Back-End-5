@@ -9,12 +9,16 @@ const todoSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    createdBy:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"User"
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
     },
-    isCompleted:{
-        type:Boolean,
+    isCompleted: {
+        type: Boolean,
+        default: false
+    },
+    isEditing: {
+        type: Boolean,
         default: false
     }
 }, { timestamps: true })
