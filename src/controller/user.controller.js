@@ -30,7 +30,7 @@ const userRegister = asyncHandler(async (req, res, next) => {
     if (
         [username, password, fullName, email].some((fields) => fields?.trim() === "")
     ) {
-        throw new ApiError(400, "All fields are required")
+        res.status(401).json(new ApiError(401, "All fields are required"))
     }
 
     // chek if user already exist
@@ -40,7 +40,7 @@ const userRegister = asyncHandler(async (req, res, next) => {
     })
 
     if (userExist) {
-        throw new ApiError(401, "User Already exist with email or username")
+        res.status(401).json(new ApiError(401, "user already exist with the email or username"))
     }
 
     // create user and store in db
@@ -57,7 +57,7 @@ const userRegister = asyncHandler(async (req, res, next) => {
     const createdUser = await User.findById(user._id).select("-pasword")
 
     if (!createdUser) {
-        throw new ApiError(500, "Something went wrong")
+        res.status(401).json(new ApiError(401, "Something went wrong"))
     }
 
     // return response
@@ -74,7 +74,8 @@ const userLogin = asyncHandler(async (req, res, next) => {
     // check username or email are not empty
 
     if (!username && !email) {
-        throw new ApiError(401, "username or email is required")
+        res.status(401).json(new ApiError(401, "username or email is required"))
+
     }
 
     // chek user exist or not
@@ -84,14 +85,14 @@ const userLogin = asyncHandler(async (req, res, next) => {
     })
 
     if (!user) {
-        throw new ApiError(404, "User doesn't exist")
+        res.status(401).json(new ApiError(401, "Invalid Credintials"))
     }
 
     // chekck password matched
 
     const isPassMatched = await user.isPasswordCorrect(password)
     if (!isPassMatched) {
-        throw new ApiError(401, "Invalid Credintials")
+        res.status(401).json(new ApiError(401, "Invalid Password"))
     }
 
 
@@ -111,8 +112,8 @@ const userLogin = asyncHandler(async (req, res, next) => {
     const options = {
         httpOnly: true,
         secure: true,
-        sameSite: process.env.NODE_ENV === "Development" ? "lax" : "none",
-        secure: process.env.NODE_ENV === "Development" ? false : true
+        sameSite: "none",
+        secure: true
     }
 
     // response user successfully login
